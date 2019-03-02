@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.421
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crypto", "Crypto\Crypto.csproj", "{47176121-6A3E-4C33-A83E-D53027D676C2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LRSR_Tests", "LRSR_Tests\LRSR_Tests.csproj", "{E796D2F9-1218-4210-BFA8-E17EA6BC1724}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LRSR", "LRSR\LRSR.csproj", "{7072B53E-23DF-4D1C-BBC9-6D968B69A81A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{47176121-6A3E-4C33-A83E-D53027D676C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{47176121-6A3E-4C33-A83E-D53027D676C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{47176121-6A3E-4C33-A83E-D53027D676C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{47176121-6A3E-4C33-A83E-D53027D676C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E796D2F9-1218-4210-BFA8-E17EA6BC1724}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E796D2F9-1218-4210-BFA8-E17EA6BC1724}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E796D2F9-1218-4210-BFA8-E17EA6BC1724}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E796D2F9-1218-4210-BFA8-E17EA6BC1724}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7072B53E-23DF-4D1C-BBC9-6D968B69A81A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7072B53E-23DF-4D1C-BBC9-6D968B69A81A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7072B53E-23DF-4D1C-BBC9-6D968B69A81A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7072B53E-23DF-4D1C-BBC9-6D968B69A81A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
