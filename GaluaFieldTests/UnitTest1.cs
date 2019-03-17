@@ -15,6 +15,9 @@ namespace GaluaFieldTests
             Assert.Equal("110", gf.Mod("10000"));
             Assert.Equal("11", gf.Mod("1000"));
             Assert.Equal("100", gf.Mod("100"));
+
+            gf = new GF("10");
+            Assert.Equal("0", gf.Mod("1000"));
         }
 
         [Fact]

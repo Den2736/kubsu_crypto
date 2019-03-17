@@ -21,6 +21,7 @@ namespace LRSR_Tests
         public void IrreducibleTest()
         {
             var register = new LRSR.LRSR();
+            // TODO rename: it's NonPrimitive
             Assert.True(register.IsIrreducible("100101"));
             Assert.True(register.IsIrreducible("1101"));
             Assert.True(register.IsIrreducible("11001"));

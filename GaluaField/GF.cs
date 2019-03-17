@@ -24,6 +24,10 @@ namespace GaluaField
         {
             return Mod(SimpleAdd(lhs, rhs));
         }
+        public byte Add(byte lhs, byte rhs)
+        {
+            return Convert.ToByte(Add(Convert.ToString(lhs, 2), Convert.ToString(rhs, 2)), 2);
+        }
         private string SimpleAdd(string lhs, string rhs)
         {
             while (lhs.Length < rhs.Length) lhs += '0';
@@ -36,6 +40,10 @@ namespace GaluaField
         public string Mult(string lhs, string rhs)
         {
             return Mod(SimpleMult(lhs, rhs));
+        }
+        public byte Mult(byte lhs, byte rhs)
+        {
+            return Convert.ToByte(Mult(Convert.ToString(lhs, 2), Convert.ToString(rhs, 2)), 2);
         }
         private string SimpleMult(string lhs, string rhs)
         {
