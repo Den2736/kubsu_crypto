@@ -37,5 +37,7 @@ namespace LRSR_Tests
 
             return base.Equals(obj);
         }
+
+        public override int GetHashCode(){ return GetHashCode(); }
     }
 }
