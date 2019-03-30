@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -6,81 +7,86 @@ using System.Security.Cryptography;
 namespace BmpHashValidation {
     public class BmpHashValidator : IDisposable {
 
-        public void WriteHashInto (string pathToBmp) {
-            byte[] bytes = File.ReadAllBytes (pathToBmp);
-            byte[] hash = GetPictureHash (pathToBmp);
+        public void WriteHash(string source, string target) {
+            const int hashLen = 16;
 
-            Log (bytes, "bmp-before.txt");
-            Log (hash, "hash.txt");
+            byte[] bytes = File.ReadAllBytes(source);
+            int imageStartsFrom = BitConverter.ToInt32(bytes.Skip(10).Take(4).ToArray(), 0);
+            byte[] imgBytes = bytes.Skip(imageStartsFrom).ToArray();
 
-            bytes[6] = hash[0];
-            bytes[7] = hash[1];
-            bytes[8] = hash[2];
-            bytes[9] = hash[3];
+            var clearedImageBytes = Smear(imgBytes, Enumerable.Range(0, hashLen).Select(x => (byte) 0).ToArray());
+            var clearedBytes = new byte[][] {
+                bytes.Take(imageStartsFrom).ToArray(),
+                    clearedImageBytes
+            }.SelectMany(b => b).ToArray();
+            File.WriteAllBytes("cleared.bmp", clearedBytes);
+            Log(clearedImageBytes, "cleared.txt");
 
-            bytes[30] = hash[4];
-            bytes[31] = hash[5];
-            bytes[32] = hash[6];
-            bytes[33] = hash[7];
+            byte[] hash = MD5.Create().ComputeHash(imgBytes);
+            Log(hash, "hash.txt");
 
-            bytes[46] = hash[8];
-            bytes[47] = hash[9];
-            bytes[48] = hash[10];
-            bytes[49] = hash[11];
-            bytes[50] = hash[12];
-            bytes[51] = hash[13];
-            bytes[52] = hash[14];
-            bytes[53] = hash[15];
-
-            File.WriteAllBytes (pathToBmp, bytes);
-            Log (bytes, "bmp-after.txt");
+            var hashedImageBytes = Smear(clearedImageBytes, hash);
+            var hashedBytes = new byte[][] {
+                bytes.Take(imageStartsFrom).ToArray(),
+                    hashedImageBytes
+            }.SelectMany(b => b).ToArray();
+            File.WriteAllBytes(target, hashedBytes);
+            Log(hashedImageBytes, "hashed.txt");
         }
-        private byte[] GetPictureHash (string pathToBmp) {
-            byte[] data = File.ReadAllBytes (pathToBmp).Skip (54).ToArray ();
 
-            using (var md5 = MD5.Create ()) {
-                return md5.ComputeHash (data);
+        private byte[] Smear(byte[] data, byte[] smeared) {
+            for (int i = 0; i < smeared.Length; i++) {
+                string bits = Convert.ToString(smeared[i], 2);
+                while (bits.Length < 8) bits = new string(bits.Prepend('0').ToArray());
+
+                for (int j = 0; j < 8; j++) {
+                    string dataBits = Convert.ToString(data[i * 8 + j], 2);
+                    while (dataBits.Length < 8) dataBits = new string(dataBits.Prepend('0').ToArray());
+                    dataBits = new string(dataBits.Take(7).ToArray());
+
+                    dataBits += bits[j];
+                    data[i * 8 + j] = Convert.ToByte(dataBits, 2);
+                }
             }
+
+            return data;
+        }
+        private byte[] GetSmearedDataFrom(byte[] data, int smearedDataLen) {
+            var res = new List<byte>();
+
+            for (int i = 0; i < smearedDataLen; i++) {
+                string smearedBits = "";
+                for (int j = 0; j < 8; j++) {
+                    string dataBits = Convert.ToString(data[i * 8 + j], 2);
+                    smearedBits += dataBits.Last();
+                }
+                res.Add(Convert.ToByte(smearedBits, 2));
+            }
+            return res.ToArray();
         }
 
-        private byte[] GetHashFrom (string pathToBmp) {
-            byte[] bytes = File.ReadAllBytes (pathToBmp);
-            byte[] hash = new byte[16];
+        public bool HashIsValid(string pathToBmp) {
+            const int hashLen = 16;
 
-            hash[0] = bytes[6];
-            hash[1] = bytes[7];
-            hash[2] = bytes[8];
-            hash[3] = bytes[9];
+            byte[] bytes = File.ReadAllBytes(pathToBmp);
+            int imageStartsFrom = BitConverter.ToInt32(bytes.Skip(10).Take(4).ToArray(), 0);
 
-            hash[4] = bytes[30];
-            hash[5] = bytes[31];
-            hash[6] = bytes[32];
-            hash[7] = bytes[33];
-            hash[8] = bytes[46];
-            hash[9] = bytes[47];
-            hash[10] = bytes[48];
-            hash[11] = bytes[49];
-            hash[12] = bytes[50];
-            hash[13] = bytes[51];
-            hash[14] = bytes[52];
-            hash[15] = bytes[53];
+            byte[] imgBytes = bytes.Skip(imageStartsFrom).ToArray();
+            Log(imgBytes, "test-image.txt");
+            byte[] smearedHash = GetSmearedDataFrom(imgBytes, hashLen);
+            Log(smearedHash, "test-smeared-hash.txt");
 
-            return hash;
+            var clearedImageBytes = Smear(imgBytes, Enumerable.Range(0, hashLen).Select(x => (byte) 0).ToArray());
+            Log(clearedImageBytes, "test-cleared.txt");
+            byte[] hash = MD5.Create().ComputeHash(clearedImageBytes);
+            Log(hash, "test-hash.txt");
+
+            return Enumerable.SequenceEqual(hash, smearedHash);
         }
 
-        public bool HashIsValid (string pathToBmp) {
-            byte[] hash = GetHashFrom (pathToBmp);
-            byte[] factHash = GetPictureHash (pathToBmp);
-
-            Log (hash, "test-hash.txt");
-            Log (factHash, "test-fact-hash.txt");
-
-            return Enumerable.SequenceEqual (hash, factHash);
+        private void Log(byte[] data, string path) {
+            File.WriteAllLines(path, data.Select(b => b.ToString()));
         }
-
-        private void Log (byte[] data, string path) {
-            File.WriteAllLines (path, data.Select (b => b.ToString ()));
-        }
-        public void Dispose () { }
+        public void Dispose() { }
     }
 }

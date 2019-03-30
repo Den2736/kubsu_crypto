@@ -9,25 +9,20 @@ using Xunit;
 namespace BmpHashValidationTests {
     public class UnitTest1 {
         [Fact]
-        public void ValidExpected () {
+        public void ValidExpected() {
             string bmpPath = "test.bmp";
-            using (var validator = new BmpHashValidator ()) {
-                validator.WriteHashInto (bmpPath);
-                Assert.True (validator.HashIsValid (bmpPath));
+            string hashedbmpPath = "hashed.bmp";
+            using(var validator = new BmpHashValidator()) {
+                validator.WriteHash(bmpPath, hashedbmpPath);
+                Assert.True(validator.HashIsValid(hashedbmpPath));
             }
         }
 
         [Fact]
-        public async Task InvalidExpected () {
-            string bmpPath = "test.bmp";
-            using (var validator = new BmpHashValidator ()) {
-                validator.WriteHashInto (bmpPath);
-
-                var data = await File.ReadAllBytesAsync (bmpPath);
-                data[54] = (byte) (~ data[54]);
-                await File.WriteAllBytesAsync (bmpPath, data);
-
-                Assert.False (validator.HashIsValid (bmpPath));
+        public void Check() {
+            string hashedbmpPath = "hashed.bmp";
+            using(var validator = new BmpHashValidator()) {
+                Assert.True(validator.HashIsValid(hashedbmpPath));
             }
         }
     }
